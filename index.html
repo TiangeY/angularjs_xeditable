@@ -1,0 +1,66 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Angular.js Example</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-mocks.js"></script>
+	<link href="css/xeditable.css" rel="stylesheet">
+	<script src="js/xeditable.js"></script>
+	<script src="script.js"></script>
+	<link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body ng-app="myApp" ng-controller="myCtrl">
+	<div class="upper">
+		<div id="title">TODOLIST</div>
+		<div id="search"><span>SEARCH</span><input ng-model="query" type="text"/></div>
+	</div>
+	
+	<div class="list">
+	   <table id="table" class="table table-bordered table-hover table-condensed">
+		<tr id="list-tr1" class="list-tr" style="font-weight: bold">
+		  <th class="th1"><a href="" ng-click="sortField = 'importance'; reserve=!reserve">How&nbsp;&uarr;&darr;</a></th>
+		  <th class="th2"><a href="" ng-click="sortField = 'what'; reserve=!reserve">What&nbsp;&uarr;&darr;</a></th>
+		  <th class="th3"><a href="" ng-click="sortField = 'time'; reserve=!reserve">Time&nbsp;&uarr;&darr;</a></th>
+		  <th class="th4">Edit</th>
+		</tr>
+		<tr id="list-tr2" ng-repeat="todolist in todolists | orderBy:sortField:reserve | filter:query">
+		  <td class="td1">
+			<!-- editable importance (select-local) -->
+			<span editable-select="todolist.importance" e-name="importance" e-form="rowform" e-ng-options="s.value as s.text for s in importances">
+			  {{ showImportance(todolist) }}
+			</span>
+		  </td>
+		  <td class="td2">
+			<!-- editable what (text with validation) -->
+			<span editable-text="todolist.what" e-name="what" e-form="rowform" onbeforesave="checkWhat($data, todolist.id)" e-required>
+			  {{ todolist.what || 'empty' }}
+			</span> 
+		  </td>
+		  <td class="td3">
+			<!-- editable time (select-remote) -->
+			<span editable-select="todolist.time" e-name="time" onshow="loadTimes()" e-form="rowform" e-ng-options="g.id as g.text for g in times">
+			  {{ showTime(todolist) }}
+			</span>
+		  </td>
+		  <td class="td4">
+			<!-- form -->
+			<form editable-form name="rowform" onbeforesave="saveTodolist($data, todolist.id)" ng-show="rowform.$visible" class="form-buttons form-inline" shown="inserted == todolist">
+			  <button id="save" type="submit" ng-disabled="rowform.$waiting" class="btn btn-primary">
+				save
+			  </button>
+			  <button id="cancel" type="button" ng-disabled="rowform.$waiting" ng-click="rowform.$cancel()" class="btn btn-default">
+				cancel
+			  </button>
+			</form>
+			<div class="buttons" ng-show="!rowform.$visible">
+			  <button id="edit" class="btn btn-primary" ng-click="rowform.$show()">Edit</button>
+			  <button id="del" class="btn btn-danger" ng-click="removeTodolist($index)">Delete</button>
+			</div>  
+		  </td>
+		</tr>
+	  </table>
+
+	  <button id="add" class="btn btn-default" ng-click="addTodolist()">WHAT NEEDS TO BE DONE TODAY?</button>
+	</div>
+  </body>
+</html>
